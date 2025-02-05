@@ -29,13 +29,27 @@ def kidneys(database):
         msg = 'Cannot autosegment the kidneys: series ' + UNETR_kidneys_v1.trained_on + ' not found.'
         raise RuntimeError(msg)
 
+    if database.PatientName [0:4] == '7128':
     # Loop over the series and create the mask
     #desc = sery.instance().SeriesDescription
-    array_out  , header   = series[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
-    array_in   , header_in    = series[1].array(['SliceLocation'], pixels_first=True, first_volume=True)
-    array_water, header_water = series[2].array(['SliceLocation'], pixels_first=True, first_volume=True)
-    array_fat  , header_fat   = series[3].array(['SliceLocation'], pixels_first=True, first_volume=True)
-    array = np.stack((array_out, array_in, array_water, array_fat), axis=0)
+
+        array_out  , header   = series[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_out = array_out[:, :, ::-1,...]
+        array_in   , header_in    = series[1].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_in = array_in[:, :, ::-1,...]
+        array_water, header_water = series[2].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_water = array_water[:, :, ::-1,...]
+        array_fat  , header_fat   = series[3].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_fat = array_fat[:, :, ::-1,...]
+        array = np.stack((array_out, array_in, array_water, array_fat), axis=0)
+    
+    else:
+
+        array_out  , header   = series[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_in   , header_in    = series[1].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_water, header_water = series[2].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array_fat  , header_fat   = series[3].array(['SliceLocation'], pixels_first=True, first_volume=True)
+        array = np.stack((array_out, array_in, array_water, array_fat), axis=0)
     # Calculate predictions 
     masks = UNETR_kidneys_v1.apply(array, weights)
     left_kidney, right_kidney = UNETR_kidneys_v1.kidney_masks(masks)
