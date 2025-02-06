@@ -37,7 +37,7 @@ def single_subject(username, password, path, dataset):
     steps_core.rename_all_series(database)
     steps_core.harmonize_t2(database)
     #steps_core.harmonize_dce(database)
-    steps_core.harmonize_subject_name(database)
+    steps_core.harmonize_subject_name(database,dataset)
     
     # SEGMENTATION
 

@@ -129,7 +129,7 @@ def check(database):
 
             if row['MRI Sequence'] == 'T2m_magnitude':
                 series = database.series(SeriesDescription='T2m_magnitude')
-                AcquisitiomTimes = series[0].values('AcquisitionTimes', dims=dims)
+                AcquisitiomTimes = series[0].values('AcquisitionTime', dims=dims)
                 if len(AcquisitiomTimes) == 55:
                     df.at[index, 'Notes'] = 'Correct'
                     continue
@@ -148,13 +148,13 @@ def check(database):
 
             if row['MRI Sequence'] == 'IVIM':
                 series = database.series(SeriesDescription='IVIM')
-                bvals = series[0].values('DiffusionBValue', dims=['SliceLocation', 'InstanceNumber'])
+                shape = series[0].shape(dims=['SliceLocation', 'InstanceNumber'])
 
-                if bvals.shape[0] == 30:
+                if shape[1] == 30:
                     df.at[index, 'Notes'] = 'Correct'
                     continue
                 else:
-                    df.at[index, 'Notes'] = 'b-values length (12) = ' + str(len(bvals))
+                    df.at[index, 'Notes'] = 'b-values length (30) = ' + str(shape[1])
                     df.at[index, 'Checked'] = 2
 
             if row['MRI Sequence'] == 'DTI':
@@ -436,7 +436,19 @@ def GE_rename(series):
     The sequence names in Leeds have been removed by the anonymisation
     procedure and must be recovered from other attributes
     """
-    SeqName = series["SequenceName"]
+    SeqName = series["SeriesDescription"]
+
+    if SeqName == '*fl3d2':
+        sequence = 'Dixon'
+        imType = series["ImageType"]
+        if imType[3] == 'OUT_PHASE' or imType[4] == 'OUT_PHASE': 
+            return sequence + '_out_phase'
+        if imType[3] == 'IN_PHASE'  or imType[4] == 'IN_PHASE': 
+            return sequence + '_in_phase'
+        if imType[3] == 'FAT'       or imType[4] == 'FAT': 
+            return sequence + '_fat'
+        if imType[3] == 'WATER'     or imType[4] == 'WATER': 
+            return sequence + '_water'
 
     if SeqName is None:
         return
