@@ -129,7 +129,7 @@ def check(database):
 
             if row['MRI Sequence'] == 'T2m_magnitude':
                 series = database.series(SeriesDescription='T2m_magnitude')
-                AcquisitiomTimes = series[0].values('AcquisitionTimes', dims=dims)
+                AcquisitiomTimes = series[0].values('AcquisitionTime', dims=dims)
                 if len(AcquisitiomTimes) == 55:
                     df.at[index, 'Notes'] = 'Correct'
                     continue
@@ -148,13 +148,13 @@ def check(database):
 
             if row['MRI Sequence'] == 'IVIM':
                 series = database.series(SeriesDescription='IVIM')
-                bvals = series[0].values('DiffusionBValue', dims=['SliceLocation', 'InstanceNumber'])
+                shape = series[0].shape(dims=['SliceLocation', 'InstanceNumber'])
 
-                if bvals.shape[0] == 30:
+                if shape[1] == 30:
                     df.at[index, 'Notes'] = 'Correct'
                     continue
                 else:
-                    df.at[index, 'Notes'] = 'b-values length (12) = ' + str(len(bvals))
+                    df.at[index, 'Notes'] = 'b-values length (30) = ' + str(shape[1])
                     df.at[index, 'Checked'] = 2
 
             if row['MRI Sequence'] == 'DTI':

@@ -5,6 +5,7 @@ from wezel.plugins.pyvista import SurfaceDisplay
 
 
 from pipelines import (
+    fetch_AI_model,
     fetch_Drive_mask,
     rename, 
     harmonize, 
@@ -107,7 +108,7 @@ menu_harmonize.add(action_harmonize_all)
 
 def fetch_dl_models(app):
     folder = app.database()
-    fetch_Drive_mask.dl_models(folder)
+    fetch_AI_model.dl_models(folder)
     app.refresh()
 
 def fetch_kidney_masks(app):
@@ -117,7 +118,7 @@ def fetch_kidney_masks(app):
 
 def segment_kidneys(app):
     database = app.database()
-    kidneys = segment.kidneys(database, weights)
+    kidneys = segment.kidneys(database)
     for kidney in kidneys:
         app.addWidget(SurfaceDisplay(kidney), title=kidney.label())
     app.refresh()
@@ -172,7 +173,7 @@ def all_segmentation_steps(app):
 
 
 action_all_segmentation_steps = Action("All above segmentation steps..", on_clicked=all_segmentation_steps, is_clickable=_if_a_database_is_open)
-action_fetch_dl_models = Action("Fetch deep learning models..", on_clicked=fetch_dl_models, is_clickable=_never)
+action_fetch_dl_models = Action("Fetch deep learning models..", on_clicked=fetch_dl_models, is_clickable=_if_a_database_is_open)
 action_fetch_kidney_masks = Action("Fetch kidney masks..", on_clicked=fetch_kidney_masks, is_clickable=_never)
 action_segment_kidneys = Action("Auto-segment kidneys...", on_clicked=segment_kidneys, is_clickable=_if_a_database_is_open)
 action_renal_sinus_fat = Action("Segment renal sinus fat..", on_clicked=segment_renal_sinus_fat, is_clickable=_if_a_database_is_open)
