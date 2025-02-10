@@ -147,6 +147,16 @@ def pc_right(database):
 def subject_name_internal(database,dataset):
 
     series_list = database.series()
+
+    if dataset[0] == 7:
+        subject_name = database.PatientName
+        if len(subject_name) != 7:
+            correct_name = database.PatientName[3:7]+ "_" + database.PatientName[7:]
+            database.PatientName = correct_name
+            database.save()
+            return
+
+
     subject_name = series_list[0]['PatientID']
     if len(subject_name) != 7 or subject_name[4] != "_":
 

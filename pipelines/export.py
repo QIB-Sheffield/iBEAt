@@ -52,6 +52,8 @@ def kidney_masks_as_dicom_folder_1(folder):
     out_desc = 'Dixon_post_contrast_out_phase'
     in_desc = 'Dixon_post_contrast_in_phase'
     water_desc = 'Dixon_post_contrast_water'
+    k_means1_desc = 'KMeans cluster 1'
+    k_means2_desc = 'KMeans cluster 2'
     lk_mask = 'LK' 
     rk_mask = 'RK'
 
@@ -59,22 +61,12 @@ def kidney_masks_as_dicom_folder_1(folder):
     out_ph = folder.series(SeriesDescription=out_desc)
     in_ph = folder.series(SeriesDescription=in_desc)
     water = folder.series(SeriesDescription=water_desc)
+    k_means1 = folder.series(SeriesDescription=k_means1_desc)
+    k_means2 = folder.series(SeriesDescription=k_means2_desc)
     LK = folder.series(SeriesDescription=lk_mask)
     RK = folder.series(SeriesDescription=rk_mask)
 
-    if len(out_ph) == 0:
-        fat_desc = 'Dixon_fat_' 
-        out_desc = 'Dixon_out_phase'
-        in_desc = 'Dixon_in_phase'
-        water_desc = 'Dixon_water'
-
-        fat = folder.series(SeriesDescription=fat_desc)
-        out_ph = folder.series(SeriesDescription=out_desc)
-        in_ph = folder.series(SeriesDescription=in_desc)
-        water = folder.series(SeriesDescription=water_desc)
-        
-
-    export_to_folder = LK + RK + fat + out_ph + in_ph + water
+    export_to_folder = LK + RK + fat + out_ph + in_ph + water + k_means1 + k_means2
     
     for series in export_to_folder:
         series.export_as_dicom(results_path)
@@ -83,7 +75,7 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
 #def kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase',RK_mask = 'RK', LK_mask = 'LK' ): #ONLY FOR REPEATABILITY STUDY
 
     database.message('Exporting masks as png..')
-    results_path = os.path.join(database.path() + '_output',database.PatientName)
+    results_path = os.path.join(database.path() + '_output')
     if not os.path.exists(results_path):
         os.mkdir(results_path)
 
@@ -109,19 +101,22 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
     array_overlay_mask_LK = array_overlay_mask_LK.transpose((1,0,2))
     array_overlay_mask_RK = array_overlay_mask_RK.transpose((1,0,2))
 
-    array_overlay_mask = array_overlay_mask_LK + array_overlay_mask_RK
-    array_overlay_mask[array_overlay_mask >0.5] = 1
-    array_overlay_mask[array_overlay_mask <0.5] = np.nan
+    #array_overlay_mask = array_overlay_mask_LK + array_overlay_mask_RK
+    array_overlay_mask_LK[array_overlay_mask_LK >0.5] = 1
+    array_overlay_mask_LK[array_overlay_mask_LK <0.5] = np.nan
+
+    array_overlay_mask_RK[array_overlay_mask_RK >0.5] = 1
+    array_overlay_mask_RK[array_overlay_mask_RK <0.5] = np.nan
     
 
 
-    num_row_cols = int(np.ceil (np.sqrt(array_overlay_mask.shape[2])))
+    num_row_cols = int(np.ceil (np.sqrt(array_overlay_mask_LK.shape[2])))
 
     fig, ax = plt.subplots(nrows=num_row_cols, ncols=num_row_cols,gridspec_kw = {'wspace':0, 'hspace':0},figsize=(num_row_cols,num_row_cols))
     i=0
     for row in ax:
         for col in row:
-            if i>=array_overlay_mask.shape[2]:
+            if i>=array_overlay_mask_LK.shape[2]:
                 col.set_xticklabels([])
                 col.set_yticklabels([])
                 col.set_aspect('equal')
@@ -132,7 +127,8 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
                 col.imshow(array_series_img[:,:,i], cmap='gray', interpolation='none', vmin=0, vmax=np.mean(array_series_img) + 2 * np.std(array_series_img))
             
                 # Overlay the mask with transparency
-                col.imshow(array_overlay_mask[:,:,i], cmap='autumn', interpolation='none', alpha=0.5)
+                col.imshow(array_overlay_mask_LK[:,:,i], cmap='autumn', interpolation='none', alpha=0.5)
+                col.imshow(array_overlay_mask_RK[:,:,i], cmap='summer', interpolation='none', alpha=0.5)
 
                 col.set_xticklabels([])
                 col.set_yticklabels([])
@@ -143,7 +139,7 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
 
     
     fig.suptitle(mask_name, fontsize=14)
-    fig.savefig(os.path.join(results_path, 'Masks.png'), dpi=600)
+    fig.savefig(os.path.join(results_path, database.PatientName +'.png'), dpi=600)
 
 def kidney_masks_as_png(database,backgroud_series = 'Dixon_post_contrast_out_phase',RK_mask = 'RK', LK_mask = 'LK', mask_name = 'Masks' ):
 #def kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase',RK_mask = 'RK', LK_mask = 'LK' ): #ONLY FOR REPEATABILITY STUDY

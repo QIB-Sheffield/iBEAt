@@ -436,10 +436,25 @@ def GE_rename(series):
     The sequence names in Leeds have been removed by the anonymisation
     procedure and must be recovered from other attributes
     """
-    SeqName = series["SequenceName"]
+    SeqName = series["SeriesDescription"]
+    print(SeqName)
 
-    if SeqName is None:
-        return
+    if SeqName == 'InPhase: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_in_phase'
+    if SeqName == 'OutPhase: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_out_phase'
+    if SeqName == 'WATER: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_water'
+    if SeqName == 'FAT: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_fat'
+    if SeqName == 'InPhase: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_in_phase'
+    if SeqName == 'OutPhase: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_out_phase'
+    if SeqName == 'WATER: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_water'
+    if SeqName == 'FAT: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_fat'
 
 def all_series(folder):
 
@@ -482,7 +497,7 @@ def all_series(folder):
                 continue
             series.SeriesDescription = imDescription
 
-        elif Manufacturer == 'GE':
+        elif Manufacturer == 'GE MEDICAL SYSTEMS':
             imDescription = GE_rename(series)
             if imDescription is None:
                 continue

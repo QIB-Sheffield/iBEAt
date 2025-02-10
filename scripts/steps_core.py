@@ -1,6 +1,7 @@
 import time
 from pipelines import (
     fetch_AI_model,
+    fetch_nnunet_model,
     fetch_Drive_mask,
     segment, 
     measure, 
@@ -129,6 +130,16 @@ def fetch_dl_models(database):
         database.log("Fetching deep-learning models was NOT completed; error: "+str(e))
         database.restore()
 
+def fetch_nnunet_models(database):
+    start_time = time.time()
+    database.log("Fetching deep-learning models has started")
+    try:
+        fetch_nnunet_model.nnunet_models(database)
+        database.log("Fetching deep-learning models was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Fetching deep-learning models was NOT completed; error: "+str(e))
+        database.restore()
+
 def fetch_kidney_masks(database):
     start_time = time.time()
     database.log("Fetching kidney masks has started")
@@ -163,6 +174,28 @@ def segment_kidneys(database):
 
     database.log("Kidney segmentation was completed --- %s seconds ---" % (int(time.time() - start_time)))
 
+def segment_kidneys_nnunet(database):
+    start_time = time.time()
+    database.log("Kidney segmentation has started")
+    try:
+
+        lk = database.series(SeriesDescription='LK')
+        rk = database.series(SeriesDescription='RK')
+
+        if len(lk) == 0 or len(rk) == 0:
+            database.log("Starting nnunet kidney segmentation")
+            segment.kidneys_nnunet(database)
+            database.log("nnunet Kidney segmentation was completed")
+        else:
+            database.log('Both masks were already present - no nnunet kidney segmentation was performed.')
+        database.save()
+        
+    except Exception as e:
+        database.log("nnunet Kidney segmentation was NOT completed; error: "+str(e))
+        database.restore()
+        raise RuntimeError('Critical step failed (kidney segmentation) - exiting pipeline.')
+
+    database.log("Kidney segmentation was completed --- %s seconds ---" % (int(time.time() - start_time)))
 
 def segment_renal_sinus_fat(database):
     start_time = time.time()
