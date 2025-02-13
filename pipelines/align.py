@@ -88,6 +88,14 @@ def dce(database):
     ]
     return _align_2d(database, series_desc)
 
+def t1w(database):
+
+    desc = [ 
+        'LK',
+        'RK',  
+        'T1w_magnitude',
+    ]
+    return _align_2d(database, desc)
 
 def mt(database):
     series_desc = [ 

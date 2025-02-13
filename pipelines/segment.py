@@ -4,6 +4,7 @@ from dbdicom.pipelines import input_series
 from models import DCE_aorta, PC, UNETR_kidneys_v1, nnUnet_Dixon_v1
 import utilities.zenodo_link as UNETR_zenodo
 import utilities.zenodo_link_nnunet as nnunet_zenodo
+import utilities.fill_DCE_mask_gaps as fill_DCE_mask_gaps
 import os
 import shutil
 
@@ -316,3 +317,38 @@ def cortex_medulla_local(database):
     LKC = scipy.image_calculator(series[2], series[3], 'series 1 - series 2')
 
     database.save()
+
+def fill_DCE_cor_med_masks(database):
+
+    export_study = '0: Segmentations'
+
+    desc = [ 
+        'LKC', 
+        'LKM',
+        'RKC', 
+        'RKM',
+    ]
+
+    series, study = input_series(database, desc, export_study)
+
+    RKM_2 = scipy.series_calculator(series[3], operation='a * series', param=2)
+    LKM_2 = scipy.series_calculator(series[1], operation='a * series', param=2)
+
+    LK_prior = scipy.image_calculator(series[0], LKM_2, 'series 1 + series 2',series_desc='LK_prior')
+    RK_prior = scipy.image_calculator(series[2], RKM_2, 'series 1 + series 2',series_desc='RK_prior')
+
+    features = [
+    'T1w_magnitude',
+    ]
+
+    for kidney in ['LK','RK']:
+        desc = [kidney] + [features[0] + '_' + kidney + '_align_fill'] + [kidney + '_prior']
+        series, study = input_series(database, desc, export_study)
+        if series is None:
+            raise ValueError('Cannot separate cortex and medulla for kidney '+kidney+': required sequences are missing.')
+        
+        clusters = fill_DCE_mask_gaps.class_with_ones(series[1], series[0], series[-1])
+        clusters.SeriesDescription = kidney[0:2] + '_prior_res_nb'
+
+        #clusters.move_to(study)
+        database.save()

@@ -115,6 +115,14 @@ def export_segmentations_folder_volumetry_1(database):
     except Exception as e:
         database.log("Export kidney segmentations was NOT completed; error: "+str(e))
 
+def fill_DCE_masks(database):
+    start_time = time.time()
+    database.log("Filling DCE masks has started")
+    try:
+        segment.fill_DCE_cor_med_masks(database)
+        database.log("Filling DCE masks was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Filling DCE masks was NOT completed; error: "+str(e))
 
 ## MODEL-DRIVEN MOTION CORRECTION
 
@@ -247,3 +255,17 @@ def export_project_post_contrast_in_out_Dixon_to_AI(database,subject_ID):
         database.log("Export to AI was completed --- %s seconds ---" % (int(time.time() - start_time)))
     except Exception as e:
         database.log("Export to AI was NOT completed; error: "+str(e))
+
+
+def export_DCE_AI(database,subject_ID):
+    start_time = time.time()
+    database.log("Export DCE AI has started")
+    try:
+        export.DCE_AI(database,subject_ID)
+        database.log("Export DCE AI was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Export DCE AI was NOT completed; error: "+str(e))
+
+
+    
+    

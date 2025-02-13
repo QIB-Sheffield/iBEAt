@@ -596,6 +596,18 @@ def align_ASL(database):
         database.log("ASL alignment was NOT completed; error: "+str(e))
         database.restore()
 
+def align_T1w(database):
+    start_time = time.time()
+    print('Starting T1w alignment')
+    database.log("T1w alignment has started")
+    try:
+        align.t1w(database)
+        database.log("T1w alignment was completed --- %s seconds ---" % (int(time.time() - start_time)))
+        database.save()
+    except Exception as e: 
+        database.log("T1w alignment was NOT completed; error: "+str(e))
+        database.restore()
+
 def export_alignment(database):
     start_time = time.time()
     print('Exporting alignment')
