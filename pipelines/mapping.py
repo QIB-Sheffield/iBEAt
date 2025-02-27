@@ -15,7 +15,7 @@ from scipy.optimize import curve_fit
 
 export_study = '2: Parameter maps'
 
-def Dixon_post_contrast_fat_dominant(folder):
+def Dixon_post_contrast_water_dominant(folder):
 
     # Find source DICOM data
     series_Dixon_fat, study_Dixon_fat, desc_Dixon_fat                   = _map_input   (folder, "Dixon_post_contrast_fat")

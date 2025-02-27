@@ -33,15 +33,15 @@ def single_subject(username, password, path, dataset,subject_ID=None):
     
     # HARMONIZATION
 
-    #steps_core.rename_all_series(database)
-    #steps_core.harmonize_dce(database)
-    #steps_core.harmonize_subject_name(database)
+    steps_core.rename_all_series(database)
+    steps_core.harmonize_dce(database)
+    steps_core.harmonize_subject_name(database)
 
     # MAPPING
 
-    steps_internal.map_post_contrast_fat_dominant(database)
+    steps_internal.map_post_contrast_water_dominant(database)
 
     # ALIGNMENT
-
+    subject_ID ='000'
     steps_internal.export_project_post_contrast_in_out_Dixon_to_AI(database,subject_ID)
     #steps_internal.export_project_post_Dixon_whole_kidney_only_segmentations_as_png(database)
