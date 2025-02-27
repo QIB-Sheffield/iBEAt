@@ -168,8 +168,75 @@ def renal_sinus_fat(folder):
         sinus_fat = scipy.image_calculator(fat_mask, kidney_hull, 'series 1 * series 2', integer=True)
         #sinus_fat_open = skimage.opening_3d(sinus_fat)
         sinus_fat_largest = scipy.extract_largest_cluster_3d(sinus_fat)
+        # closing after selecting largest cluster
         sinus_fat_largest.SeriesDescription = kidney.instance().SeriesDescription + 'SF'
         sf_series.append(sinus_fat_largest)
+        # Cleanup
+        kidney_hull.remove()
+        #sinus.remove()
+        sinus_fat.remove()
+    
+    fat_image_masked.remove()
+    fat_mask.remove()   
+
+    return sf_series
+
+def renal_sinus_fat_open_close(folder):
+
+    fat = folder.series(SeriesDescription='Dixon_post_contrast_fat')
+    lk  = folder.series(SeriesDescription='LK')
+    rk  = folder.series(SeriesDescription='RK')
+
+    kidneys = lk+rk
+    sf_series = []
+
+    if len(kidneys)==[]:
+        msg = 'Cannot perform renal sinus fat segmentation: no kidney masks are available.'
+        raise RuntimeError(msg)
+
+    fat_image_masked, fat_mask = dipy.median_otsu(fat[0], median_radius=1, numpass=1)
+
+    for kidney in kidneys:
+        kidney_hull = skimage.convex_hull_image_3d(kidney)
+        sinus_fat = scipy.image_calculator(fat_mask, kidney_hull, 'series 1 * series 2', integer=True)
+        sinus_fat_open = skimage.opening_3d(sinus_fat)
+        sinus_fat_largest = scipy.extract_largest_cluster_3d(sinus_fat_open)
+        sinus_fat_largest_close = scipy.closing_3d(sinus_fat_largest)
+        sinus_fat_largest.SeriesDescription = kidney.instance().SeriesDescription + 'SF'
+        sf_series.append(sinus_fat_largest_close)
+        # Cleanup
+        kidney_hull.remove()
+        #sinus.remove()
+        sinus_fat.remove()
+    
+    fat_image_masked.remove()
+    fat_mask.remove()   
+
+    return sf_series
+
+def renal_sinus_fat_close(folder):
+
+    fat = folder.series(SeriesDescription='Dixon_post_contrast_fat')
+    lk  = folder.series(SeriesDescription='LK')
+    rk  = folder.series(SeriesDescription='RK')
+
+    kidneys = lk+rk
+    sf_series = []
+
+    if len(kidneys)==[]:
+        msg = 'Cannot perform renal sinus fat segmentation: no kidney masks are available.'
+        raise RuntimeError(msg)
+
+    fat_image_masked, fat_mask = dipy.median_otsu(fat[0], median_radius=1, numpass=1)
+
+    for kidney in kidneys:
+        kidney_hull = skimage.convex_hull_image_3d(kidney)
+        sinus_fat = scipy.image_calculator(fat_mask, kidney_hull, 'series 1 * series 2', integer=True)
+        #sinus_fat_open = skimage.opening_3d(sinus_fat)
+        sinus_fat_largest = scipy.extract_largest_cluster_3d(sinus_fat)
+        sinus_fat_largest_close = skimage.closing_3d(sinus_fat_largest)
+        sinus_fat_largest.SeriesDescription = kidney.instance().SeriesDescription + 'SF'
+        sf_series.append(sinus_fat_largest_close)
         # Cleanup
         kidney_hull.remove()
         #sinus.remove()
@@ -337,8 +404,6 @@ def fill_DCE_cor_med_masks(database):
     LK_prior = scipy.image_calculator(series[0], LKM_2, 'series 1 + series 2',series_desc='LK_prior')
     RK_prior = scipy.image_calculator(series[2], RKM_2, 'series 1 + series 2',series_desc='RK_prior')
 
-    database.save()
-
     features = [
     'T1w_magnitude',
     ]
@@ -353,4 +418,4 @@ def fill_DCE_cor_med_masks(database):
         clusters.SeriesDescription = kidney[0:2] + '_prior_res_nb'
 
         #clusters.move_to(study)
-    database.save()
+        database.save()
