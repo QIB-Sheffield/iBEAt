@@ -1,4 +1,4 @@
-import vreg
+from dbdicom.extensions import vreg
 import numpy as np
 
 def class_with_ones(img_series, mask, prior):
@@ -26,7 +26,7 @@ def class_with_ones(img_series, mask, prior):
     cluster_mask_arr = cluster_mask_arr[..., np.newaxis, np.newaxis]
     
     # Save results in DICOM
-    clusters = img_series.new_sibling(SeriesDescription='Local Classification with Adjacent Pixels')
+    clusters = img_series.new_sibling(SeriesDescription='Filled_with_cortex')
     clusters.set_array(cluster_mask_arr, headers, pixels_first=True)
 
     return clusters

@@ -91,8 +91,6 @@ def dce(database):
 def t1w(database):
 
     desc = [ 
-        'LK',
-        'RK',  
         'T1w_magnitude',
     ]
     return _align_2d(database, desc)
@@ -160,7 +158,8 @@ def fill_gaps(database):
     to_fill = [
         'DCE_mdr_moco_AVD_map',
         'DCE_mdr_moco_RPF_map',
-        'DCE_mdr_moco_MTT_map',        
+        'DCE_mdr_moco_MTT_map',
+        'T1w_magnitude',        
     ]
     ref = ['Dixon_post_contrast_fat']
 

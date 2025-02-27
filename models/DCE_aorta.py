@@ -26,13 +26,17 @@ def segment(axial):
     axenh_blur[p2[1],p2[0]] = 0
     _, _, _, p3 = cv2.minMaxLoc(axenh_blur)
 
-    seeds = [[p1[1],p1[0]], [p2[1],p2[0]], [p3[1],p3[0]]]
     max_iteration = 20
     for i in range(max_iteration):
+        seeds = [[p1[1],p1[0]], [p2[1],p2[0]], [p3[1],p3[0]]]
+        print(seeds)    
         aif_mask = region_grow_thresh(axenh, seeds, threshold)
+        print (seeds)
         if len(aif_mask[aif_mask==1]) >= 25:
+            
             break
         threshold += 1
+        aif_mask = []
 
     return aif_mask
 

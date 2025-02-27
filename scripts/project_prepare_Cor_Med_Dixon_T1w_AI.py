@@ -52,3 +52,9 @@ def single_subject(username, password, path, dataset,subject_ID=None):
 
     steps_core.fill_gaps(database)
     steps_core.cortex_medulla(database)
+    steps_internal.fill_DCE_masks(database)
+
+    steps_internal.export_DCE_AI(database,subject_ID)
+    steps_internal.export_DCE_AI_segmentations(database)
+
+    
