@@ -337,6 +337,8 @@ def fill_DCE_cor_med_masks(database):
     LK_prior = scipy.image_calculator(series[0], LKM_2, 'series 1 + series 2',series_desc='LK_prior')
     RK_prior = scipy.image_calculator(series[2], RKM_2, 'series 1 + series 2',series_desc='RK_prior')
 
+    database.save()
+
     features = [
     'T1w_magnitude',
     ]
@@ -351,4 +353,4 @@ def fill_DCE_cor_med_masks(database):
         clusters.SeriesDescription = kidney[0:2] + '_prior_res_nb'
 
         #clusters.move_to(study)
-        database.save()
+    database.save()
