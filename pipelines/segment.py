@@ -201,7 +201,7 @@ def renal_sinus_fat_open_close(folder):
         sinus_fat = scipy.image_calculator(fat_mask, kidney_hull, 'series 1 * series 2', integer=True)
         sinus_fat_open = skimage.opening_3d(sinus_fat)
         sinus_fat_largest = scipy.extract_largest_cluster_3d(sinus_fat_open)
-        sinus_fat_largest_close = scipy.closing_3d(sinus_fat_largest)
+        sinus_fat_largest_close = skimage.closing_3d(sinus_fat_largest)
         sinus_fat_largest.SeriesDescription = kidney.instance().SeriesDescription + 'SF'
         sf_series.append(sinus_fat_largest_close)
         # Cleanup
