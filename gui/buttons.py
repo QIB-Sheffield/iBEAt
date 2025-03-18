@@ -131,6 +131,22 @@ def segment_renal_sinus_fat(app):
             app.addWidget(SurfaceDisplay(sinus_fat), title=sinus_fat.label())
     app.refresh()
 
+def segment_renal_sinus_fat_close(app):
+    database = app.database()
+    sinus_fats = segment.renal_sinus_fat_close(database)
+    if sinus_fats is not None:
+        for sinus_fat in sinus_fats:
+            app.addWidget(SurfaceDisplay(sinus_fat), title=sinus_fat.label())
+    app.refresh()
+
+def segment_renal_sinus_fat_open_close(app):
+    database = app.database()
+    sinus_fats = segment.renal_sinus_fat_open_close(database)
+    if sinus_fats is not None:
+        for sinus_fat in sinus_fats:
+            app.addWidget(SurfaceDisplay(sinus_fat), title=sinus_fat.label())
+    app.refresh()
+
 def segment_aorta_on_dce(app):
     database = app.database()
     aorta_mask = segment.aorta_on_dce(database)
@@ -177,6 +193,9 @@ action_fetch_dl_models = Action("Fetch deep learning models..", on_clicked=fetch
 action_fetch_kidney_masks = Action("Fetch kidney masks..", on_clicked=fetch_kidney_masks, is_clickable=_never)
 action_segment_kidneys = Action("Auto-segment kidneys...", on_clicked=segment_kidneys, is_clickable=_if_a_database_is_open)
 action_renal_sinus_fat = Action("Segment renal sinus fat..", on_clicked=segment_renal_sinus_fat, is_clickable=_if_a_database_is_open)
+action_renal_sinus_fat_close = Action("Segment renal sinus fat close..", on_clicked=segment_renal_sinus_fat_close, is_clickable=_if_a_database_is_open)
+action_renal_sinus_fat_open_close = Action("Segment renal sinus fat open close..", on_clicked=segment_renal_sinus_fat_open_close, is_clickable=_if_a_database_is_open)
+
 action_aorta_on_dce = Action("Segment aorta on DCE..", on_clicked=segment_aorta_on_dce, is_clickable=_if_a_database_is_open)
 action_renal_artery = Action("Segment renal artery on PC..", on_clicked=segment_renal_artery, is_clickable=_if_a_database_is_open)
 action_whole_kidney_canvas = Action("Calculate segmentation canvas..", on_clicked=whole_kidney_canvas, is_clickable=_if_a_database_is_open)
@@ -187,6 +206,9 @@ menu_segment.add(action_fetch_dl_models)
 menu_segment.add(action_fetch_kidney_masks)
 menu_segment.add(action_segment_kidneys)
 menu_segment.add(action_renal_sinus_fat)
+menu_segment.add(action_renal_sinus_fat_close)
+menu_segment.add(action_renal_sinus_fat_open_close)
+
 menu_segment.add(action_aorta_on_dce)
 menu_segment.add(action_renal_artery)
 menu_segment.add_separator()

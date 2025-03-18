@@ -115,6 +115,14 @@ def export_segmentations_folder_volumetry_1(database):
     except Exception as e:
         database.log("Export kidney segmentations was NOT completed; error: "+str(e))
 
+def fill_DCE_masks(database):
+    start_time = time.time()
+    database.log("Filling DCE masks has started")
+    try:
+        segment.fill_DCE_cor_med_masks(database)
+        database.log("Filling DCE masks was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Filling DCE masks was NOT completed; error: "+str(e))
 
 ## MODEL-DRIVEN MOTION CORRECTION
 
@@ -131,12 +139,12 @@ def mdreg_t1_t2(database):
     
 ## MAPPING
 
-def map_post_contrast_fat_dominant(database):
+def map_post_contrast_water_dominant(database):
     start_time = time.time()
     print('Starting fat dominant mapping')
     database.log("Fat dominant mapping has started")
     try:
-        mapping.Dixon_post_contrast_fat_dominant(database)
+        mapping.Dixon_post_contrast_water_dominant(database)
         database.log("Fat dominant was completed --- %s seconds ---" % (int(time.time() - start_time)))
         database.save()
     except Exception as e: 
@@ -247,3 +255,51 @@ def export_project_post_contrast_in_out_Dixon_to_AI(database,subject_ID):
         database.log("Export to AI was completed --- %s seconds ---" % (int(time.time() - start_time)))
     except Exception as e:
         database.log("Export to AI was NOT completed; error: "+str(e))
+
+
+def export_DCE_AI(database,subject_ID):
+    start_time = time.time()
+    database.log("Export DCE AI has started")
+    try:
+        export.DCE_AI(database,subject_ID)
+        database.log("Export DCE AI was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Export DCE AI was NOT completed; error: "+str(e))
+
+
+def export_DCE_AI_segmentations(database):
+    start_time = time.time()
+    database.log("Export kidney segmentations has started")
+
+    try:
+        export.kidney_masks_as_png(database,mask_name = 'Kidney_Masks')
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+    try:
+        export.aif_as_png(database)
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+
+    try:
+        export.kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase [coreg]',RK_mask = 'RKM', LK_mask = 'LKM',mask_name = 'Medulla_masks')
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+
+    try:
+        export.kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase [coreg]',RK_mask = 'RKC', LK_mask = 'LKC', mask_name = 'Cortex_masks')
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+
+    try:
+        export.kidney_masks_as_png(database,backgroud_series = 'T1w_magnitude_LK_align_fill',RK_mask = 'RKC', LK_mask = 'LKM', mask_name = 'T1w_LK_medulla_masks')
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+
+    try:
+        export.kidney_masks_as_png(database,backgroud_series = 'T1w_magnitude_RK_align_fill',RK_mask = 'RKM', LK_mask = 'LKC', mask_name = 'T1w_RK_medulla_masks')
+    except Exception as e:
+        database.log("Export kidney segmentations was NOT completed; error: "+str(e))
+
+
+    
+    

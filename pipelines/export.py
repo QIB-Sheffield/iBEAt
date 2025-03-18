@@ -52,6 +52,8 @@ def kidney_masks_as_dicom_folder_1(folder):
     out_desc = 'Dixon_post_contrast_out_phase'
     in_desc = 'Dixon_post_contrast_in_phase'
     water_desc = 'Dixon_post_contrast_water'
+    k_means1_desc = 'KMeans cluster 1'
+    k_means2_desc = 'KMeans cluster 2'
     lk_mask = 'LK' 
     rk_mask = 'RK'
 
@@ -59,22 +61,12 @@ def kidney_masks_as_dicom_folder_1(folder):
     out_ph = folder.series(SeriesDescription=out_desc)
     in_ph = folder.series(SeriesDescription=in_desc)
     water = folder.series(SeriesDescription=water_desc)
+    k_means1 = folder.series(SeriesDescription=k_means1_desc)
+    k_means2 = folder.series(SeriesDescription=k_means2_desc)
     LK = folder.series(SeriesDescription=lk_mask)
     RK = folder.series(SeriesDescription=rk_mask)
 
-    if len(out_ph) == 0:
-        fat_desc = 'Dixon_fat_' 
-        out_desc = 'Dixon_out_phase'
-        in_desc = 'Dixon_in_phase'
-        water_desc = 'Dixon_water'
-
-        fat = folder.series(SeriesDescription=fat_desc)
-        out_ph = folder.series(SeriesDescription=out_desc)
-        in_ph = folder.series(SeriesDescription=in_desc)
-        water = folder.series(SeriesDescription=water_desc)
-        
-
-    export_to_folder = LK + RK + fat + out_ph + in_ph + water
+    export_to_folder = LK + RK + fat + out_ph + in_ph + water + k_means1 + k_means2
     
     for series in export_to_folder:
         series.export_as_dicom(results_path)
@@ -83,7 +75,7 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
 #def kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase',RK_mask = 'RK', LK_mask = 'LK' ): #ONLY FOR REPEATABILITY STUDY
 
     database.message('Exporting masks as png..')
-    results_path = os.path.join(database.path() + '_output',database.PatientName)
+    results_path = os.path.join(database.path() + '_output')
     if not os.path.exists(results_path):
         os.mkdir(results_path)
 
@@ -109,19 +101,22 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
     array_overlay_mask_LK = array_overlay_mask_LK.transpose((1,0,2))
     array_overlay_mask_RK = array_overlay_mask_RK.transpose((1,0,2))
 
-    array_overlay_mask = array_overlay_mask_LK + array_overlay_mask_RK
-    array_overlay_mask[array_overlay_mask >0.5] = 1
-    array_overlay_mask[array_overlay_mask <0.5] = np.nan
+    #array_overlay_mask = array_overlay_mask_LK + array_overlay_mask_RK
+    array_overlay_mask_LK[array_overlay_mask_LK >0.5] = 1
+    array_overlay_mask_LK[array_overlay_mask_LK <0.5] = np.nan
+
+    array_overlay_mask_RK[array_overlay_mask_RK >0.5] = 1
+    array_overlay_mask_RK[array_overlay_mask_RK <0.5] = np.nan
     
 
 
-    num_row_cols = int(np.ceil (np.sqrt(array_overlay_mask.shape[2])))
+    num_row_cols = int(np.ceil (np.sqrt(array_overlay_mask_LK.shape[2])))
 
     fig, ax = plt.subplots(nrows=num_row_cols, ncols=num_row_cols,gridspec_kw = {'wspace':0, 'hspace':0},figsize=(num_row_cols,num_row_cols))
     i=0
     for row in ax:
         for col in row:
-            if i>=array_overlay_mask.shape[2]:
+            if i>=array_overlay_mask_LK.shape[2]:
                 col.set_xticklabels([])
                 col.set_yticklabels([])
                 col.set_aspect('equal')
@@ -132,7 +127,8 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
                 col.imshow(array_series_img[:,:,i], cmap='gray', interpolation='none', vmin=0, vmax=np.mean(array_series_img) + 2 * np.std(array_series_img))
             
                 # Overlay the mask with transparency
-                col.imshow(array_overlay_mask[:,:,i], cmap='autumn', interpolation='none', alpha=0.5)
+                col.imshow(array_overlay_mask_LK[:,:,i], cmap='autumn', interpolation='none', alpha=0.5)
+                col.imshow(array_overlay_mask_RK[:,:,i], cmap='summer', interpolation='none', alpha=0.5)
 
                 col.set_xticklabels([])
                 col.set_yticklabels([])
@@ -143,10 +139,10 @@ def kidney_masks_as_png_folder_1(database,backgroud_series = 'Dixon_post_contras
 
     
     fig.suptitle(mask_name, fontsize=14)
-    fig.savefig(os.path.join(results_path, 'Masks.png'), dpi=600)
+    fig.savefig(os.path.join(results_path, database.PatientName +'.png'), dpi=600)
 
-def kidney_masks_as_png(database,backgroud_series = 'Dixon_post_contrast_out_phase',RK_mask = 'RK', LK_mask = 'LK', mask_name = 'Masks' ):
-#def kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase',RK_mask = 'RK', LK_mask = 'LK' ): #ONLY FOR REPEATABILITY STUDY
+#def kidney_masks_as_png(database,backgroud_series = 'Dixon_post_contrast_out_phase',RK_mask = 'RK', LK_mask = 'LK', mask_name = 'Masks' ):
+def kidney_masks_as_png(database,backgroud_series = 'Dixon_out_phase',RK_mask = 'RK', LK_mask = 'LK',mask_name = 'Masks' ): #ONLY FOR REPEATABILITY STUDY
 
     database.message('Exporting masks as png..')
     results_path = database.path() + '_output'
@@ -209,7 +205,7 @@ def kidney_masks_as_png(database,backgroud_series = 'Dixon_post_contrast_out_pha
 
     
     fig.suptitle(mask_name, fontsize=14)
-    fig.savefig(os.path.join(results_path, 'Masks.png'), dpi=600)
+    fig.savefig(os.path.join(results_path, mask_name + '.png'), dpi=600)
 
 def left_renal_artery_masks_as_png(database,backgroud_series = 'PC_left_velocity', LK_mask = 'PC-LRA' ):
 
@@ -766,11 +762,11 @@ def pre_Dixon_in_out_to_AI(folder, subject_ID):
 
     out_ph = folder.series(SeriesDescription=out_desc)
     in_ph = folder.series(SeriesDescription=in_desc)
-    fat_dominant = 'Dixon_fat_dominant_map'
+    water_dominant = 'Dixon_water_dominant_map'
 
     out_ph = folder.series(SeriesDescription=out_desc)
     in_ph = folder.series(SeriesDescription=in_desc)
-    fat_dom = folder.series(SeriesDescription=fat_dominant)
+    fat_dom = folder.series(SeriesDescription=water_dominant)
 
     array_out_ph, _ = out_ph[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
     array_in_ph, _  = in_ph[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
@@ -899,3 +895,92 @@ def post_contrast_in_out_Dixon_to_AI(folder, subject_ID='000'):
 
     nii_water = nib.Nifti1Image(array_water, affine)
     nib.save(nii_water, os.path.join(results_path, 'Dixon_'+ subject_ID + '_water.nii.gz'))
+
+
+def DCE_AI(folder, subject_ID):
+
+    folder.message('Exporting kidney masks as nifti')
+    results_path = os.path.join(folder.path() + '_output', 'DCE_AI')
+    if not os.path.exists(results_path):
+        os.mkdir(results_path)
+
+    fat_desc = 'Dixon_fat [coreg]' 
+    out_desc = 'Dixon_out_phase [coreg]'
+    in_desc = 'Dixon_in_phase [coreg]'
+    water_desc = 'Dixon_water [coreg]'
+    t1w_LK_desc = 'T1w_magnitude_LK_align_fill'
+    t1w_RK_desc = 'T1w_magnitude_RK_align_fill'
+
+    lk_mask = 'LK' 
+    rk_mask = 'RK'
+    lkcm_mask = 'LK_prior_res_nb'
+    rkcm_mask = 'RK_prior_res_nb'
+
+
+
+    fat = folder.series(SeriesDescription=fat_desc)
+    out_ph = folder.series(SeriesDescription=out_desc)
+    in_ph = folder.series(SeriesDescription=in_desc)
+    water = folder.series(SeriesDescription=water_desc)
+    t1w_LK = folder.series(SeriesDescription=t1w_LK_desc)
+    t1w_RK = folder.series(SeriesDescription=t1w_RK_desc)
+    LK = folder.series(SeriesDescription=lk_mask)
+    RK = folder.series(SeriesDescription=rk_mask)
+    LKCM = folder.series(SeriesDescription=lkcm_mask)
+    RKCM = folder.series(SeriesDescription=rkcm_mask)
+
+
+    array_fat, _    = fat[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+    array_out_ph, _ = out_ph[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+    array_in_ph, _  = in_ph[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+    array_water, _  = water[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+
+    array_t1w_LK, _ = t1w_LK[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+    array_t1w_RK, _ = t1w_RK[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+
+    array_LK, _   = vreg.mask_array(LK[0], on=water[0], dim='AcquisitionTime')
+    array_RK, _   = vreg.mask_array(RK[0], on=water[0], dim='AcquisitionTime')
+    array_LKCM, _ = LKCM[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+    array_RKCM, _ = RKCM[0].array(['SliceLocation'], pixels_first=True, first_volume=True)
+
+    array_LK[array_LK >0.5] = 1
+    array_LK[array_LK <0.5] = 0
+    array_RK[array_RK >0.5] = 1
+    array_RK[array_RK <0.5] = 0
+    array_RK = np.squeeze(array_RK)
+    array_LK = np.squeeze(array_LK)
+
+    array_BK = array_RK + array_LK
+    array_BK[array_BK >0.5] = 1
+    array_BK[array_BK <0.5] = 0
+
+    array_LKCM[(array_LKCM > 0.5) & (array_LKCM < 1.5)] = 3
+    array_LKCM[(array_LKCM > 1.5) & (array_LKCM < 2.5)] = 4
+
+    array_RKCM[(array_RKCM > 0.5) & (array_RKCM < 1.5)] = 1
+    array_RKCM[(array_RKCM > 1.5) & (array_RKCM < 2.5)] = 2
+
+    final_mask = np.squeeze(array_LKCM) + np.squeeze(array_RKCM)
+
+    array_t1w_LK_temp = np.squeeze(array_t1w_LK) * np.squeeze(array_LK)
+    array_t1w_RK_temp = np.squeeze(array_t1w_RK) * np.squeeze(array_RK)
+    array_t1w = array_t1w_LK_temp + array_t1w_RK_temp
+
+    affine = np.eye(4)
+    nii_final_mask = nib.Nifti1Image(final_mask, affine)
+    nib.save(nii_final_mask, os.path.join(results_path, 'DCE_'+ subject_ID + '.nii.gz'))
+
+    nii_out_ph = nib.Nifti1Image(np.squeeze(array_out_ph)*np.squeeze(array_BK), affine)
+    nib.save(nii_out_ph, os.path.join(results_path, 'DCE_'+ subject_ID + '_0000.nii.gz'))
+
+    nii_in_ph = nib.Nifti1Image(np.squeeze(array_in_ph)*np.squeeze(array_BK), affine)
+    nib.save(nii_in_ph, os.path.join(results_path, 'DCE_'+ subject_ID + '_0001.nii.gz'))
+
+    nii_water = nib.Nifti1Image(np.squeeze(array_water)*np.squeeze(array_BK), affine)
+    nib.save(nii_water, os.path.join(results_path, 'DCE_'+ subject_ID + '_0002.nii.gz'))
+
+    nii_fat = nib.Nifti1Image(np.squeeze(array_fat)*np.squeeze(array_BK), affine)
+    nib.save(nii_fat, os.path.join(results_path, 'DCE_'+ subject_ID + '_0003.nii.gz'))
+
+    nii_t1w = nib.Nifti1Image(array_t1w, affine)
+    nib.save(nii_t1w, os.path.join(results_path, 'DCE_'+ subject_ID + '_0004.nii.gz'))

@@ -13,6 +13,9 @@ import os
 def XNAT_download(username,password,path,DatasetSelected,SpecificDataset=None):
     url = "https://qib.shef.ac.uk"
 
+    if DatasetSelected[0] == 7:
+        DatasetSelected[1] = DatasetSelected[2]
+
     if SpecificDataset!=None:
         
         site = SpecificDataset.split('_')[0]
@@ -33,9 +36,9 @@ def XNAT_download(username,password,path,DatasetSelected,SpecificDataset=None):
         elif site == '5128': #Turku
             DatasetSelected[0] = 4
             DatasetSelected[1] = 3 #GE
-        # elif site == '2178': #Sheffield
-        #     DatasetSelected[0] = 7
-        #     DatasetSelected[1] = 0
+        elif site == '2178': #Sheffield
+            DatasetSelected[0] = 7
+            DatasetSelected[1] = DatasetSelected[2]
 
 
     with xnat.connect(url, user=username, password=password) as session:
@@ -47,13 +50,13 @@ def XNAT_download(username,password,path,DatasetSelected,SpecificDataset=None):
         #projectSelected = 6
         projectSelected = DatasetSelected[0]
         projectID = xnatProjects[projectSelected]
-        #print(projectID)
+        print(projectID)
         
         projectName = [project.name for project in session.projects.values() if project.secondary_id == projectID][0]
         if projectName:
             xnatSubjects = [subject.label for subject in session.projects[projectName].subjects.values()]
-            #for x_2 in range(len(xnatSubjects)):
-                #print (str(x_2) +": " + xnatSubjects[x_2])
+            for x_2 in range(len(xnatSubjects)):
+                print (str(x_2) +": " + xnatSubjects[x_2])
             #print("Select the project:")
             #xnatSubjectsSelected = int(input())
             #xnatSubjectsSelected = 0
@@ -61,6 +64,13 @@ def XNAT_download(username,password,path,DatasetSelected,SpecificDataset=None):
             #print(xnatSubjects[xnatSubjectsSelected])
             subjectName = xnatSubjects[xnatSubjectsSelected]
             dataset = session.projects[projectName]
+
+            if DatasetSelected[0] == 7:
+                dataset = session.projects[projectName].subjects[subjectName]
+                dataset.download_dir(path)
+                print(str(xnatSubjects[xnatSubjectsSelected]))
+                return str(xnatSubjects[xnatSubjectsSelected])
+
 
             xnatExperiments = [experiment.label for experiment in session.projects[projectName].subjects[subjectName].experiments.values()]
             if SpecificDataset!=None:

@@ -437,21 +437,24 @@ def GE_rename(series):
     procedure and must be recovered from other attributes
     """
     SeqName = series["SeriesDescription"]
+    print(SeqName)
 
-    if SeqName == '*fl3d2':
-        sequence = 'Dixon'
-        imType = series["ImageType"]
-        if imType[3] == 'OUT_PHASE' or imType[4] == 'OUT_PHASE': 
-            return sequence + '_out_phase'
-        if imType[3] == 'IN_PHASE'  or imType[4] == 'IN_PHASE': 
-            return sequence + '_in_phase'
-        if imType[3] == 'FAT'       or imType[4] == 'FAT': 
-            return sequence + '_fat'
-        if imType[3] == 'WATER'     or imType[4] == 'WATER': 
-            return sequence + '_water'
-
-    if SeqName is None:
-        return
+    if SeqName == 'InPhase: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_in_phase'
+    if SeqName == 'OutPhase: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_out_phase'
+    if SeqName == 'WATER: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_water'
+    if SeqName == 'FAT: T1_abdomen_dixon_cor_bh':
+        return 'Dixon_fat'
+    if SeqName == 'InPhase: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_in_phase'
+    if SeqName == 'OutPhase: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_out_phase'
+    if SeqName == 'WATER: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_water'
+    if SeqName == 'FAT: T1_abdomen_post_contrast_dixon_cor_bh':
+        return 'Dixon_post_contrast_fat'
 
 def all_series(folder):
 
@@ -494,7 +497,7 @@ def all_series(folder):
                 continue
             series.SeriesDescription = imDescription
 
-        elif Manufacturer == 'GE':
+        elif Manufacturer == 'GE MEDICAL SYSTEMS':
             imDescription = GE_rename(series)
             if imDescription is None:
                 continue

@@ -8,7 +8,7 @@ Download XNAT dataset -> Name Standardization ->    Execute MDR   -> Custom Modd
 TO RUN THE SCRIPT YOU USE: python main_cluster.py --num n (WHERE n is an integer with the value of the XNAT dataset)
 """
 import argparse
-from scripts.project_prepare_t2s import single_subject
+from scripts.Folder_Volumetry_2_dcmFinalMasks_Dixons import single_subject
 import utilities.XNAT_credentials as XNAT_cred
 import os
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     #XNAT Credentials
     username, password = XNAT_cred.main()
     
-    path = "//mnt//fastdata//" + username + "//<insert project name>" #CLUSTER PATH TO SAVE DATA, ADD YOUR LOCAL PATH IF YOU WANT TO RUN IT LOCALLY
+    path = "//mnt//fastdata//" + username + "//FODLER_2" #CLUSTER PATH TO SAVE DATA, ADD YOUR LOCAL PATH IF YOU WANT TO RUN IT LOCALLY
     if not os.path.exists(path):
         os.mkdir(path)
     
@@ -43,6 +43,15 @@ if __name__ == '__main__':
     #->6: BEAt-DKD-WP4-Leeds          3: Leeds_RAVE_Reconstructions                       ..........
     #  7: BEAt-DKD-WP4-Sheffield      4: Leeds_setup_scans                      ->14: Leeds_Patient_4128015
     #########################################################################################################################################
+
+
+    #offset = 0                  #Bordeaux   Baseline 2,1    =  49
+    #offset = 49                 #Exeter     Baseline 3,0    = 111
+    #offset = 49+111             #Exeter     Followup 3,3    =  44
+    #offset = 49+111+44          #Leeds      Baseline 6,0    =  62
+    #offset = 49+111+44+62        #Bordeaux   Followup 2,0    =  26
+
+
 
     single_subject(username, password, path, dataset)
 

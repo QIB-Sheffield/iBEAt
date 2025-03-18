@@ -8,7 +8,7 @@ Download XNAT dataset -> Name Standardization ->    Execute MDR   -> Custom Modd
 TO RUN THE SCRIPT YOU USE: python main_cluster.py --num n (WHERE n is an integer with the value of the XNAT dataset)
 """
 import argparse
-from scripts.project_prepare_pre_Dixon_AI import single_subject
+from scripts.project_prepare_Cor_Med_Dixon_T1w_AI import single_subject
 import utilities.XNAT_credentials as XNAT_cred
 import os
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     #XNAT Credentials
     username, password = XNAT_cred.main()
 
-    path = "//mnt//fastdata//" + username + "//<insert project name>" #CLUSTER PATH TO SAVE DATA, ADD YOUR LOCAL PATH IF YOU WANT TO RUN IT LOCALLY
+    path = "//mnt//fastdata//" + username + "//COR_MED_AI_raw" #CLUSTER PATH TO SAVE DATA, ADD YOUR LOCAL PATH IF YOU WANT TO RUN IT LOCALLY
 
     if not os.path.exists(path):
         os.mkdir(path)
