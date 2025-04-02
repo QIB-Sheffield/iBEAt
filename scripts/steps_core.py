@@ -2,7 +2,6 @@ import time
 from pipelines import (
     fetch_AI_model,
     fetch_nnunet_model,
-    fetch_Drive_mask,
     segment, 
     measure, 
     export, 
@@ -139,17 +138,6 @@ def fetch_nnunet_models(database):
     except Exception as e:
         database.log("Fetching deep-learning models was NOT completed; error: "+str(e))
         database.restore()
-
-def fetch_kidney_masks(database):
-    start_time = time.time()
-    database.log("Fetching kidney masks has started")
-    try:
-        fetch_Drive_mask.kidney_masks(database)
-        database.log("Fetching kidney masks was completed --- %s seconds ---" % (int(time.time() - start_time)))
-    except Exception as e:
-        database.log("Fetching kidney masks was NOT completed; error: "+str(e))
-        database.restore()
-
 
 def segment_kidneys(database):
     start_time = time.time()

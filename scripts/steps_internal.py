@@ -4,6 +4,7 @@ from pipelines import (
     mdr, 
     mapping, 
     harmonize,
+    measure,
     segment,
     export, 
 )
@@ -42,6 +43,16 @@ def fetch_kidney_masks(database):
         fetch_Drive_mask.kidney_masks(database)
         database.log("Fetching kidney masks was completed --- %s seconds ---" % (int(time.time() - start_time)))
         database.save()
+    except Exception as e:
+        database.log("Fetching kidney masks was NOT completed; error: "+str(e))
+        database.restore()
+
+def fetch_kidney_masks(database):
+    start_time = time.time()
+    database.log("Fetching kidney masks has started")
+    try:
+        fetch_Drive_mask.kidney_masks(database)
+        database.log("Fetching kidney masks was completed --- %s seconds ---" % (int(time.time() - start_time)))
     except Exception as e:
         database.log("Fetching kidney masks was NOT completed; error: "+str(e))
         database.restore()
@@ -203,7 +214,16 @@ def export_alignment_t2s_project(database):
         database.restore()
 
 ## MEASURE
-    
+
+def measure_kidney_volumetrics_paper_volumetry(database):
+    start_time = time.time()
+    database.log("Kidney volumetrics has started")
+    try:
+        measure.kidney_volumetrics_paper_volumetry_edited(database)
+        database.log("Kidney volumetrics was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Kidney volumetrics was NOT completed; error: "+str(e))
+
 ## ROI ANALYSIS
 
 ## DATA EXPORT

@@ -455,6 +455,8 @@ def GE_rename(series):
         return 'Dixon_post_contrast_water'
     if SeqName == 'FAT: T1_abdomen_post_contrast_dixon_cor_bh':
         return 'Dixon_post_contrast_fat'
+    if SeqName == 'T2star_map_kidneys_cor-oblique_mbh':
+        return 'T2starm_magnitude'
 
 def all_series(folder):
 

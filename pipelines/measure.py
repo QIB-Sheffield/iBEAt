@@ -52,6 +52,28 @@ def kidney_volumetrics(folder):
     features['Region of Interest'] = 'Kidney'
     _update_master_table(folder, features)
     return features
+
+def kidney_volumetrics_paper_volumetry_edited(folder):
+
+    left  = folder.series(SeriesDescription='LK_E')
+    if left == []:
+        left  = folder.series(SeriesDescription='LK_ed')
+        if left == []:
+            left  = folder.series(SeriesDescription='LK')
+
+    right  = folder.series(SeriesDescription='RK_E')
+    if right == []:
+        right  = folder.series(SeriesDescription='RK_ed')
+        if right == []:
+            right  = folder.series(SeriesDescription='RK')
+
+
+    kidneys = [left, right]
+    features = skimage.volume_features(kidneys)
+    features['Biomarker'] = features['SeriesDescription'] + '-' + features['Parameter']
+    features['Region of Interest'] = 'Kidney'
+    _update_master_table(folder, features)
+    return features
     
 def sinus_fat_volumetrics(folder):
     left  = folder.series(SeriesDescription='LKSF')
