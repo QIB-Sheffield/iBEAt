@@ -91,10 +91,10 @@ def kidneys_nnunet(database): #ADAPT TO THE nnUet for
 
     #unetr, unetr_link= UNETR_zenodo.main()
     nnUnet, unetr_link= nnunet_zenodo.main()
-    weights = os.path.join(database.path(),nnUnet)
+    weights = os.path.join(database.path(), nnUnet)
 
-    copied_folder_path = shutil.copytree(os.path.join(os.path.dirname(database.path()),'Dataset001_Dixon'),os.path.join(database.path(),'Dataset001_Dixon'))
-    copied_folder_path = shutil.copytree(os.path.join(os.path.dirname(database.path()),'nnUNetTrainer__nnUNetPlans__3d_fullres'),os.path.join(database.path(),'nnUNetTrainer__nnUNetPlans__3d_fullres'))
+    #copied_folder_path = shutil.copytree(os.path.join(os.path.dirname(database.path()),'Dataset001_Dixon'),os.path.join(database.path(),'Dataset001_Dixon'))
+    #copied_folder_path = shutil.copytree(os.path.join(os.path.dirname(database.path()),'nnUNetTrainer__nnUNetPlans__3d_fullres'),os.path.join(database.path(),'nnUNetTrainer__nnUNetPlans__3d_fullres'))
 
     database.message('Segmenting kidneys. This could take a few minutes. Please be patient..')
 
@@ -125,6 +125,10 @@ def kidneys_nnunet(database): #ADAPT TO THE nnUet for
     # Calculate predictions 
 
     masks = nnUnet_Dixon_v1.apply(array_to_predict, weights)
+
+    shutil.rmtree(weights)
+    shutil.rmtree(os.path.join(database.path(),'nnUNetTrainer__nnUNetPlans__3d_fullres'))
+
     rk, lk = nnUnet_Dixon_v1.kidney_masks(masks)
 
     if database.PatientName[0:4] == '7128':

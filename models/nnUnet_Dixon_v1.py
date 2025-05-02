@@ -91,8 +91,7 @@ def apply(input_array:np.ndarray, file:str)->np.ndarray:
 
     # initializes the network architecture, loads the checkpoint
     folder_path = os.path.dirname(file)
-    nested_folder = os.path.join(folder_path, "Dataset001_Dixon", "nnUNetTrainer__nnUNetPlans__3d_fullres")
-    os.makedirs(nested_folder, exist_ok=True)
+    nested_folder = os.path.join(folder_path, "nnUNetTrainer__nnUNetPlans__3d_fullres")
 
     predictor.initialize_from_trained_model_folder(
     nested_folder,
