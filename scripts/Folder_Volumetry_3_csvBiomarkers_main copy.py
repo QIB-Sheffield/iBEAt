@@ -14,6 +14,28 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utilities.folder_3_harmonize import standardize_name
 from scripts import steps_internal
 
+
+def join_and_cleanup_csvs(folder_path, output_file='combined.csv'):
+    # Get all CSV files in the folder
+    csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+    if len(csv_files) < 2:
+        raise ValueError("Less than two CSV files found in the folder.")
+
+    # Load and concatenate all CSVs
+    dfs = [pd.read_csv(os.path.join(folder_path, f)) for f in csv_files]
+    combined_df = pd.concat(dfs, ignore_index=True)
+
+    # Save combined CSV
+    output_path = os.path.join(folder_path, output_file)
+    combined_df.to_csv(output_path, index=False)
+    print(f"Saved combined CSV to: {output_path}")
+
+    # Delete original CSVs
+    for f in csv_files:
+        os.remove(os.path.join(folder_path, f))
+    print("Deleted original CSV files.")
+
 def unzip_file(zip_path, extract_to):
     """Unzips a file to a specified folder."""
     try:
@@ -130,7 +152,11 @@ if file_list:
                             unzip_file(os.path.join(temp_folder,file_title), temp_folder)
 
                             database = db.database(path=os.path.join(temp_folder,file_title[:-4]))
-                            steps_internal.measure_kidney_volumetrics_paper_volumetry(database)
+
+                            steps_internal.measure_kidney_volumetrics_paper_volumetry_pyradiomics(database)
+                            steps_internal.measure_kidney_volumetrics_paper_volumetry_skimage(database)
+
+                            join_and_cleanup_csvs(os.path.join(database.path() + '_output'), output_file='combined.csv')
 
                             find_and_rename_csv(os.path.join(database.path() + '_output'), patient_id+'.csv')
 
@@ -144,6 +170,7 @@ if file_list:
                             df.at[index, "CSV"] = 1
                             
                             path_to_delete = database.path()
+                            database.save()
                             database.close()
                             shutil.rmtree(path_to_delete)
                             os.remove(path_to_delete + '.zip')
@@ -214,8 +241,10 @@ if file_list:
                             unzip_file(os.path.join(temp_folder,file_title), temp_folder)
 
                             database = db.database(path=os.path.join(temp_folder,file_title[:-4]))
-                            steps_internal.measure_kidney_volumetrics_paper_volumetry(database)
-                            
+                            steps_internal.measure_kidney_volumetrics_paper_volumetry_pyradiomics(database)
+                            steps_internal.measure_kidney_volumetrics_paper_volumetry_skimage(database)
+
+                            join_and_cleanup_csvs(os.path.join(database.path() + '_output'), output_file='combined.csv')
 
                             find_and_rename_csv(os.path.join(database.path() + '_output'), patient_id+'.csv')
 
@@ -229,6 +258,7 @@ if file_list:
                             df.at[index, "CSV"] = 1
 
                             path_to_delete = database.path()
+                            database.save()
                             database.close()
                             shutil.rmtree(path_to_delete)
                             os.remove(path_to_delete + '.zip')

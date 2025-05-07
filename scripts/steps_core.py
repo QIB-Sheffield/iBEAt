@@ -619,6 +619,16 @@ def measure_kidney_volumetrics(database):
     except Exception as e:
         database.log("Kidney volumetrics was NOT completed; error: "+str(e))
 
+def measure_kidney_volumetrics_pyradiomics(database):
+    start_time = time.time()
+    database.log("Kidney volumetrics has started")
+    try:
+        measure.kidney_volumetrics_plus_pyradiomics(database)
+        database.log("Kidney volumetrics was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Kidney volumetrics was NOT completed; error: "+str(e))
+
+
 def measure_sinus_fat_volumetrics(database):
     start_time = time.time()
     database.log("Sinus fat volumetrics has started")

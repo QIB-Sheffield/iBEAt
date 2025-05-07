@@ -215,14 +215,23 @@ def export_alignment_t2s_project(database):
 
 ## MEASURE
 
-def measure_kidney_volumetrics_paper_volumetry(database):
+def measure_kidney_volumetrics_paper_volumetry_skimage(database):
     start_time = time.time()
-    database.log("Kidney volumetrics has started")
+    database.log("Kidney volumetrics with skimage has started")
     try:
-        measure.kidney_volumetrics_paper_volumetry_edited(database)
-        database.log("Kidney volumetrics was completed --- %s seconds ---" % (int(time.time() - start_time)))
+        measure.kidney_volumetrics_paper_volumetry_edited_skimage(database)
+        database.log("Kidney volumetrics with skimage was completed --- %s seconds ---" % (int(time.time() - start_time)))
     except Exception as e:
-        database.log("Kidney volumetrics was NOT completed; error: "+str(e))
+        database.log("Kidney volumetrics with skimage was NOT completed; error: "+str(e))
+
+def measure_kidney_volumetrics_paper_volumetry_pyradiomics(database):
+    start_time = time.time()
+    database.log("Kidney volumetrics with pyradiomics has started")
+    try:
+        measure.kidney_volumetrics_paper_volumetry_edited_pyradiomics(database)
+        database.log("Kidney volumetrics with pyradiomics was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Kidney volumetrics with pyradiomics was NOT completed; error: "+str(e))
 
 ## ROI ANALYSIS
 
