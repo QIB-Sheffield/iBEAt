@@ -174,6 +174,19 @@ def map_fat_dominant(database):
         database.log("Fat dominant was NOT completed; error: "+str(e))
         database.restore()
 
+
+def calculate_Dixon_fat_water(database):
+    start_time = time.time()
+    print('Starting Fat/Water Dixon mapping')
+    database.log("Fat/Water Dixon mapping has started")
+    try:
+        mapping.calculate_dixon_fat_water(database)
+        database.log("Fat/Water Dixon was calculated --- %s seconds ---" % (int(time.time() - start_time)))
+        database.save()
+    except Exception as e: 
+        database.log("Fat/Water Dixon was NOT calculated; error: "+str(e))
+        database.restore()
+
 def map_T1_from_T1_T2_mdr(database):
     start_time = time.time()
     print('Starting T1 mapping from T1_T2 MDR')

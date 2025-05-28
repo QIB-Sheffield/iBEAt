@@ -139,6 +139,16 @@ def fetch_nnunet_models(database):
         database.log("Fetching deep-learning models was NOT completed; error: "+str(e))
         database.restore()
 
+def fetch_nnunet_models_water_dominant(database): 
+    start_time = time.time()
+    database.log("Fetching deep-learning models has started")
+    try:
+        fetch_nnunet_model.nnunet_models_water_dominant(database)
+        database.log("Fetching deep-learning models was completed --- %s seconds ---" % (int(time.time() - start_time)))
+    except Exception as e:
+        database.log("Fetching deep-learning models was NOT completed; error: "+str(e))
+        database.restore()
+
 def segment_kidneys(database):
     start_time = time.time()
     database.log("Kidney segmentation has started")
@@ -184,6 +194,25 @@ def segment_kidneys_nnunet(database):
         raise RuntimeError('Critical step failed (kidney segmentation) - exiting pipeline.')
 
     database.log("Kidney segmentation was completed --- %s seconds ---" % (int(time.time() - start_time)))
+
+def segment_kidneys_nnunet_water_dominant(database):
+
+    start_time = time.time()
+    database.log("Kidneys water dominant segmentation has started")
+    try:
+
+        segment.kidneys_nnunet_water_dominant(database)
+        database.log("Kidneys water dominant segmentation was completed")
+
+        database.save()
+        
+    except Exception as e:
+        database.log("Kidneys water dominant segmentation was NOT completed; error: "+str(e))
+        database.restore()
+        raise RuntimeError('Critical step failed (Kidneys water dominant segmentation) - exiting pipeline.')
+
+    database.log("Kidneys water dominant segmentation was completed --- %s seconds ---" % (int(time.time() - start_time)))
+
 
 def segment_renal_sinus_fat(database):
     start_time = time.time()

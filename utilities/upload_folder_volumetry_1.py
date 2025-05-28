@@ -21,7 +21,7 @@ def GoogleDrive_Upload(database,filename_log):
     gauth = GoogleAuth()
     drive = GoogleDrive (gauth)
 
-    gfile = drive.CreateFile({'title':database.PatientName ,'parents': [{'id': '1qnEA7h7t1jX0DzbEUgYWvN0S_I44EYZV'}],'mimeType': 'application/vnd.google-apps.folder'})
+    gfile = drive.CreateFile({'title':database.PatientName ,'parents': [{'id': '14LTiBqG71CEumnsxReo_-0vByUymxzY1'}],'mimeType': 'application/vnd.google-apps.folder'})
     gfile.Upload(param={'supportsTeamDrives': True})
     folder_id_parent = gfile['id']
 

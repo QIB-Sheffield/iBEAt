@@ -6,12 +6,15 @@ import pydmr
 
 def convert_to_dmr(path, file):
     df = pd.read_csv(os.path.join(path, file + '.csv'))
+
+    df['SeriesDescription'] = df['SeriesDescription'].str.replace('LK_ed', 'LK')
+    df['SeriesDescription'] = df['SeriesDescription'].str.replace('RK_ed', 'RK')
+    df['PatientID'] = file
+
     pars = {}
     data = {}
     columns = ['category', 'ROI']
     rois = {
-        'RK_ed':'Right kidney',
-        'LK_ed':'Left kidney',
         'LK': 'Left kidney',
         'RK': 'Right kidney',
         'BK': 'Both kidneys',
@@ -54,3 +57,11 @@ if __name__=='__main__':
         if filename.endswith(".csv"):
             file_name_without_ext = os.path.splitext(filename)[0]
             convert_to_dmr(path, file_name_without_ext)
+
+    file_list = []
+    for filename in os.listdir(path):
+        if filename.endswith(".dmr.zip"):
+            file_list.append(filename)
+
+    pydmr.concat(file_list, os.path.jpoin(path, 'master'), cleanup=False)
+

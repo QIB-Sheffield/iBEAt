@@ -19,8 +19,8 @@ file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed = false 
 
 # Step 3: Create a figure for the scatter plot
 plt.figure(figsize=(10, 6))
-plt.xlabel('Volume (Value)')
-plt.ylabel('Compactness (Value)')
+plt.xlabel('Volume (in mL)')
+plt.ylabel('Compactness (in %)')
 plt.title('Volume vs Compactness')
 
 # Step 4: Loop through each CSV file, download, and process the data

@@ -64,6 +64,14 @@ drive = GoogleDrive(gauth)
 
 # Define the folder IDs for the two folders
 folder_id = '1iVU4aOqZPjYY1chcHKwDkVCT5_QTNojL'  # Folder for Need_editing == 0
+folder_id_Turku = '1p5ovt_Id_b8GgdzvRR95xCfuzj9Ubjh4'
+folder_id_Sheffield = '158AFMXUDzZsY_C5773wZ5xuAk3GEUvI-'
+folder_id_Leeds = '1X3E_AA2bYr7eVrVZRmX0gdccVckduguZ'
+folder_id_Exeter = '1ztmB8uEbch4y0M95D3paqQak2uSzYGvo'
+folder_id_Bordeaux = '1gy3YHtJw47pvi-jxbh6bG5LTKJTy7D60'
+folder_id_Bari = '1VnRvcOVEYgfGWpd6NGFbtVARYlXMZHb0'
+
+
 folder_id_editing = '1QxUPnd61INezsGj0Xlnb8c24bjxDcR1A'  # Folder for Need_editing == 1
 folder_id_upload = '1xhT6DlThcXqxY4_d0dbZ1EV7kDk8Xfh-'
 folder_id_main = '19AcX0V1R0ozCif_9Oy9dNZPdF2c6peUZ'
@@ -106,11 +114,13 @@ if file_list:
             for index, row in df_filtered_editing.iterrows():
                 patient_id = row["PatientID"]
 
-
-                if 'followup' in patient_id:
-                    baseline = 0
-                else:
-                    baseline = 1
+                try:
+                    if 'followup' in patient_id:
+                        baseline = 0
+                    else:
+                        baseline = 1
+                except:
+                    continue
                 patient_id = standardize_name(patient_id)
                 patient_id_zip = patient_id + "_E.zip"
 
@@ -192,12 +202,16 @@ if file_list:
             # Now handle cases where 'Need_editing' == 1, search in the 'editing' folder
             for index, row in df_filtered_editing.iterrows():
                 patient_id = row["PatientID"]
-                if 'followup' in patient_id:
-                    baseline = 0
-                else:
-                    baseline = 1
+                try:
+                    if 'followup' in patient_id:
+                        baseline = 0
+                    else:
+                        baseline = 1
+                except:
+                    continue
                 patient_id = standardize_name(patient_id)
                 patient_id_zip = patient_id + '.zip'
+
 
                 query_check = f"'{folder_id_upload}' in parents and title = '{patient_id + '.csv'}' and trashed = false"
                 file_list_check = drive.ListFile({'q': query_check}).GetList()
@@ -210,6 +224,21 @@ if file_list:
                 else:
 
                     print(f"Looking for file for PatientID (Need_editing == 0): {patient_id}")
+
+                    if patient_id[0:4] == '1128':
+                        folder_id=folder_id_Bari
+                    elif patient_id[0:4] == '2128':
+                        folder_id=folder_id_Bordeaux
+                    elif patient_id[0:4] == '3128':
+                        folder_id=folder_id_Exeter
+                    elif patient_id[0:4] == '4128':
+                        folder_id=folder_id_Leeds
+                    elif patient_id[0:4] == '5128':
+                        folder_id=folder_id_Turku
+                    elif patient_id[0:4] == '6128':
+                        folder_id=folder_id_Bordeaux
+                    elif patient_id[0:4] == '7128':
+                        folder_id=folder_id_Sheffield
 
                     # Search for the corresponding file in the Google Drive 'editing' folder
                     folder_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed = false and mimeType='application/vnd.google-apps.folder' and title contains '{patient_id}'"}).GetList()

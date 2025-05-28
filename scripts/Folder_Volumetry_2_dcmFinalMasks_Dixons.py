@@ -31,18 +31,18 @@ def single_subject(username, password, path, dataset):
     database = db.database(path=pathScan)
     
 
-    steps_internal.harmonize_subject_name(database,dataset)
+    #steps_internal.harmonize_subject_name(database,dataset)
     
     filename_log = os.path.join(database.path(), database.PatientName +"_"+ datetime.datetime.now().strftime('%Y%m%d_%H%M_') + "LogFile.txt")
     database.set_log(filename_log)
     
     # HARMONIZATION
 
-    steps_core.rename_all_series(database)
+    #steps_core.rename_all_series(database)
 
     # # SEGMENTATION
     
-    steps_internal.compute_whole_kidney_canvas(database)
+    #steps_internal.compute_whole_kidney_canvas(database)
     steps_core.fetch_nnunet_models(database)
     steps_core.segment_kidneys_nnunet(database)
     steps_internal.export_segmentations_folder_volumetry_1(database)

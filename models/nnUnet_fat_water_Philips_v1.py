@@ -55,12 +55,11 @@ def apply(input_array:np.ndarray, file:str)->np.ndarray:
 
     # initializes the network architecture, loads the checkpoint
     folder_path = os.path.dirname(file)
-    nested_folder = os.path.join(folder_path, "Dataset001_Fatwater", "nnUNetTrainer__nnUNetPlans__3d_fullres")
-    os.makedirs(nested_folder, exist_ok=True)
+    nested_folder = os.path.join(folder_path, "nnUNetTrainer__nnUNetPlans__3d_fullres")
 
     predictor.initialize_from_trained_model_folder(
     nested_folder,
-    use_folds='all',
+    use_folds='3',
     checkpoint_name='checkpoint_best.pth'
     )
     # Preprocess the input according to the model’s requirements
@@ -70,10 +69,15 @@ def apply(input_array:np.ndarray, file:str)->np.ndarray:
     temp_folder_data_to_test = os.path.join(folder_path,"temp_results",'data_to_test')
     os.makedirs(temp_folder_data_to_test, exist_ok=True)
 
-    affine = np.eye(4) 
-    nii_out_ph = nib.Nifti1Image(input_array[0,...], affine)
+    affine = np.eye(4)
+    # # Copy the original affine
+    # affine_new = affine.copy()
+    # # Flip the Z/slice axis (axis 2)
+    # affine_new[:3, 2] *= -1
+    # # Adjust the origin so that the spatial position of the data remains correct
+    # affine_new[:3, 3] += affine[:3, 2] * (input_array.shape[3] - 1)# Shift origin
+    nii_out_ph = nib.Nifti1Image(input_array[0,...], affine) # minus in the third column
     nib.save(nii_out_ph, os.path.join(temp_folder_data_to_test, 'Dixon_999_0000.nii.gz'))
-
     nii_in_ph = nib.Nifti1Image(input_array[1,...], affine)
     nib.save(nii_in_ph, os.path.join(temp_folder_data_to_test, 'Dixon_999_0001.nii.gz'))
 
@@ -84,6 +88,8 @@ def apply(input_array:np.ndarray, file:str)->np.ndarray:
 
     # Get the image data as a NumPy array
     image_data = nifti_file.get_fdata()
+
+    # image_data = image_data[:,:,::-1]
 
     shutil.rmtree(temp_folder_results)
 

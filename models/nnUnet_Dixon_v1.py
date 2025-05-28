@@ -105,7 +105,8 @@ def apply(input_array:np.ndarray, file:str)->np.ndarray:
     temp_folder_data_to_test = os.path.join(folder_path,"temp_results",'data_to_test')
     os.makedirs(temp_folder_data_to_test, exist_ok=True)
 
-    affine = np.eye(4) 
+    affine = np.eye(4)
+
     nii_out_ph = nib.Nifti1Image(input_array[0,...], affine)
     nib.save(nii_out_ph, os.path.join(temp_folder_data_to_test, 'Dixon_999_0000.nii.gz'))
 

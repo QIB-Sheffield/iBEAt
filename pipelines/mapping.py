@@ -15,6 +15,33 @@ from scipy.optimize import curve_fit
 
 export_study = '2: Parameter maps'
 
+def calculate_dixon_fat_water(folder):
+
+    # Find source DICOM data
+    series_Dixon_water_dom, study_Dixon_water_dom, desc_Dixon_water_dom = _map_input   (folder, "Dixon_post_contrast_water_dominant")
+    series_Dixon_in_phase, study_Dixon_in_phase, desc_Dixon_in_phase    = _map_input   (folder, "Dixon_post_contrast_in_phase")
+    series_Dixon_out_phase, study_Dixon_out_phase, desc_Dixon_out_phase = _map_input   (folder, "Dixon_post_contrast_out_phase")
+
+    # Load data
+    array_Dixon_water_dom, header_Dixon_water_dom = series_Dixon_water_dom.array('InstanceNumber', pixels_first=True)
+    array_Dixon_in_phase, header_Dixon_in_phase   = series_Dixon_in_phase.array('InstanceNumber', pixels_first=True)
+    array_Dixon_out_phase, header_Dixon_out_phase = series_Dixon_out_phase.array('InstanceNumber', pixels_first=True)
+
+    array_water_calculated = np.zeros_like(array_Dixon_in_phase)  # Ensure same shape
+    array_water_calculated = np.where(array_Dixon_water_dom == 1, array_Dixon_in_phase + array_Dixon_out_phase, array_water_calculated)
+    array_water_calculated = np.where(array_Dixon_water_dom == 0, array_Dixon_in_phase - array_Dixon_out_phase, array_water_calculated)
+
+    array_fat_calculated = np.zeros_like(array_Dixon_in_phase)  # Ensure same shape
+    array_fat_calculated = np.where(array_Dixon_water_dom == 0, array_Dixon_in_phase + array_Dixon_out_phase, array_fat_calculated)
+    array_fat_calculated = np.where(array_Dixon_water_dom == 1, array_Dixon_in_phase - array_Dixon_out_phase, array_fat_calculated)
+
+
+    series = study_Dixon_in_phase.new_series(SeriesDescription="Dixon_post_contrast_water")
+    series.set_array(array_water_calculated, header_Dixon_in_phase, pixels_first=True)
+
+    series = study_Dixon_in_phase.new_series(SeriesDescription="Dixon_post_contrast_fat")
+    series.set_array(array_fat_calculated, header_Dixon_in_phase, pixels_first=True)
+
 def Dixon_post_contrast_water_dominant(folder):
 
     # Find source DICOM data
